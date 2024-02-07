@@ -175,7 +175,7 @@ class EfficientNetV2PT(pl.LightningModule):
         )
 
         self.top_conv = nn.Conv2d(
-            in_channels=blockwise_output_filters[-1],
+            in_channels=output_channels,
             out_channels=top_channels,
             kernel_size=1,
             stride=1,
