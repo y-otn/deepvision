@@ -124,7 +124,7 @@ class ViTPT(pl.LightningModule):
             )
         else:
             encoded_patches = self.patching_and_embedding(x)
-        x = nn.Dropout(self.mlp_dropout)(encoded_patches)
+        x = nn.functional.dropout(encoded_patches, self.mlp_dropout, self.training)
 
         for transformer_layer in self.transformer_layers:
             x = transformer_layer(x)

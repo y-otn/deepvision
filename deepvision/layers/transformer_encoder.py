@@ -85,7 +85,7 @@ class __TransformerEncoderPT(torch.nn.Module):
 
         x = self.layer_norm1(inputs)
         attn, attn_weights = self.attn(x, x, x)
-        x = nn.Dropout(self.mlp_dropout)(attn)
+        x = nn.functional.dropout(attn, self.mlp_dropout, self.training)
         x = x + inputs
 
         y = self.layer_norm2(x)
@@ -95,9 +95,9 @@ class __TransformerEncoderPT(torch.nn.Module):
             y = self.activation(approximate="tanh")(y)
         else:
             y = self.activation()(y)
-        y = nn.Dropout(self.mlp_dropout)(y)
+        y = nn.functional.dropout(y, self.mlp_dropout, self.training)
         y = self.linear2(y)
-        y = nn.Dropout(self.mlp_dropout)(y)
+        y = nn.functional.dropout(y, self.mlp_dropout, self.training)
 
         output = x + y
 

@@ -223,7 +223,7 @@ class __FusedMBConvPT(nn.Module):
         # Residual addition with dropout
         if self.stride == 1 and self.input_filters == self.output_filters:
             if self.dropout:
-                x = nn.Dropout(self.dropout)(x)
+                x = nn.functional.dropout(x, self.dropout, self.training)
             x = x + inputs
         return x
 
