@@ -159,6 +159,7 @@ def EfficientNetV2B0(
         blockwise_se_ratios=MODEL_CONFIGS["EfficientNetV2Base"]["block_se_ratios"],
         blockwise_strides=MODEL_CONFIGS["EfficientNetV2Base"]["block_strides"],
         blockwise_conv_type=MODEL_CONFIGS["EfficientNetV2Base"]["block_conv_type"],
+        **kwargs,
     )
     return model
 
@@ -199,6 +200,7 @@ def EfficientNetV2B1(
         blockwise_se_ratios=MODEL_CONFIGS["EfficientNetV2Base"]["block_se_ratios"],
         blockwise_strides=MODEL_CONFIGS["EfficientNetV2Base"]["block_strides"],
         blockwise_conv_type=MODEL_CONFIGS["EfficientNetV2Base"]["block_conv_type"],
+        **kwargs,
     )
     return model
 
@@ -239,6 +241,7 @@ def EfficientNetV2B2(
         blockwise_se_ratios=MODEL_CONFIGS["EfficientNetV2Base"]["block_se_ratios"],
         blockwise_strides=MODEL_CONFIGS["EfficientNetV2Base"]["block_strides"],
         blockwise_conv_type=MODEL_CONFIGS["EfficientNetV2Base"]["block_conv_type"],
+        **kwargs,
     )
     return model
 
@@ -279,6 +282,7 @@ def EfficientNetV2B3(
         blockwise_se_ratios=MODEL_CONFIGS["EfficientNetV2Base"]["block_se_ratios"],
         blockwise_strides=MODEL_CONFIGS["EfficientNetV2Base"]["block_strides"],
         blockwise_conv_type=MODEL_CONFIGS["EfficientNetV2Base"]["block_conv_type"],
+        **kwargs,
     )
     return model
 
@@ -315,6 +319,7 @@ def EfficientNetV2S(
         blockwise_se_ratios=MODEL_CONFIGS["EfficientNetV2S"]["block_se_ratios"],
         blockwise_strides=MODEL_CONFIGS["EfficientNetV2S"]["block_strides"],
         blockwise_conv_type=MODEL_CONFIGS["EfficientNetV2S"]["block_conv_type"],
+        **kwargs,
     )
     return model
 
@@ -351,6 +356,7 @@ def EfficientNetV2M(
         blockwise_se_ratios=MODEL_CONFIGS["EfficientNetV2M"]["block_se_ratios"],
         blockwise_strides=MODEL_CONFIGS["EfficientNetV2M"]["block_strides"],
         blockwise_conv_type=MODEL_CONFIGS["EfficientNetV2M"]["block_conv_type"],
+        **kwargs,
     )
     return model
 
@@ -387,5 +393,6 @@ def EfficientNetV2L(
         blockwise_se_ratios=MODEL_CONFIGS["EfficientNetV2L"]["block_se_ratios"],
         blockwise_strides=MODEL_CONFIGS["EfficientNetV2L"]["block_strides"],
         blockwise_conv_type=MODEL_CONFIGS["EfficientNetV2L"]["block_conv_type"],
+        **kwargs,
     )
     return model
