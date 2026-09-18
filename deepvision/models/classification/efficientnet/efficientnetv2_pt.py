@@ -121,9 +121,12 @@ class EfficientNetV2PT(pl.LightningModule):
             padding=same_padding(3, 2),
             bias=False,
         )
-        self.stem_bn = nn.BatchNorm2d(stem_out_channels, momentum=bn_momentum)
+        self.stem_bn = nn.BatchNorm2d(stem_out_channels, momentum=1 - bn_momentum)
         self.blocks = nn.ModuleList()
-        block_num = sum(self.blockwise_num_repeat)
+        block_num = sum(
+            int(math.ceil(depth_coefficient * r)) for r in blockwise_num_repeat
+        )
+        block_id = 0
         for block_index in range(len(blockwise_num_repeat)):
             # Scale the input/output filters by the
             # width coefficient, and make them divisible again
@@ -161,11 +164,12 @@ class EfficientNetV2PT(pl.LightningModule):
                     se_ratio=blockwise_se_ratios[block_index],
                     activation=activation,
                     bn_momentum=bn_momentum,
-                    dropout=drop_connect_rate * block_index / block_num,
+                    dropout=drop_connect_rate * block_id / block_num,
                     backend="pytorch",
                     name=f"block{block_index+1}_{repeat+1}",
                 )
                 self.blocks.append(conv_block)
+                block_id += 1
 
         top_channels = _make_divisible(
             filter_num=1280,
@@ -184,7 +188,7 @@ class EfficientNetV2PT(pl.LightningModule):
         )
         self.top_bn = nn.BatchNorm2d(
             top_channels,
-            momentum=bn_momentum,
+            momentum=1 - bn_momentum,
         )
         if self.include_top:
             self.top_dense = nn.Linear(top_channels, classes)
@@ -208,16 +212,16 @@ class EfficientNetV2PT(pl.LightningModule):
 
         if self.include_top:
             # [B, C, F, F] -> [B, avg C]
-            x = nn.AvgPool2d(x.shape[2])(x).flatten(1)
+            x = x.mean((2, 3))
             x = self.top_dense(x)
             x = nn.Softmax(dim=1)(x)
         elif self.as_backbone:
             return outputs
         else:
             if self.pooling == "avg":
-                x = nn.AvgPool2d(x.shape[2])(x).flatten(1)
+                x = x.mean((2, 3))
             elif self.pooling == "max":
-                x = nn.MaxPool2d(x.shape[2])(x).flatten(1)
+                x = x.amax((2, 3))
 
         return x
 

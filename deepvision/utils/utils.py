@@ -2,6 +2,14 @@ from tensorflow import keras
 from tensorflow.keras import layers
 
 
+def drop_path(x, drop_prob, training):
+    if not drop_prob or not training:
+        return x
+    keep_prob = 1 - drop_prob
+    mask = x.new_empty((x.shape[0],) + (1,) * (x.ndim - 1)).bernoulli_(keep_prob)
+    return x * mask / keep_prob
+
+
 def same_padding(kernel_size, stride, dilation=1):
     padding = ((stride - 1) + dilation * (kernel_size - 1)) // 2
     return padding

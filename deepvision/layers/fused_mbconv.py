@@ -17,6 +17,7 @@ import torch
 import torch.nn as nn
 from tensorflow.keras import layers
 
+from deepvision.utils.utils import drop_path
 from deepvision.utils.utils import same_padding
 
 
@@ -76,7 +77,7 @@ class __FusedMBConvTF(layers.Layer):
         self.output_conv = layers.Conv2D(
             filters=self.output_filters,
             kernel_size=1 if expand_ratio != 1 else kernel_size,
-            strides=1,
+            strides=1 if expand_ratio != 1 else strides,
             padding="same",
             use_bias=False,
         )
@@ -177,7 +178,7 @@ class __FusedMBConvPT(nn.Module):
                 padding=same_padding(kernel_size, strides),
                 bias=False,
             )
-            self.bn1 = nn.BatchNorm2d(self.filters, momentum=self.bn_momentum)
+            self.bn1 = nn.BatchNorm2d(self.filters, momentum=1 - self.bn_momentum)
 
         if 0 < self.se_ratio <= 1:
             self.se_conv1 = nn.Conv2d(self.filters, self.filters_se, 1, padding="same")
@@ -187,12 +188,12 @@ class __FusedMBConvPT(nn.Module):
             in_channels=self.filters,
             out_channels=self.output_filters,
             kernel_size=1 if expand_ratio != 1 else kernel_size,
-            stride=1,
-            padding="same",
+            stride=1 if expand_ratio != 1 else strides,
+            padding=0 if expand_ratio != 1 else same_padding(kernel_size, strides),
             bias=False,
         )
 
-        self.bn_out = nn.BatchNorm2d(self.output_filters, momentum=self.bn_momentum)
+        self.bn_out = nn.BatchNorm2d(self.output_filters, momentum=1 - self.bn_momentum)
 
     def forward(self, inputs):
         if self.expand_ratio != 1:
@@ -204,7 +205,7 @@ class __FusedMBConvPT(nn.Module):
 
         # Squeeze-and-Excite
         if 0 < self.se_ratio <= 1:
-            se = nn.AvgPool2d(x.shape[2])(x)
+            se = x.mean((2, 3), keepdim=True)
             # No need to reshape, output is already [B, C, 1, 1]
             # se = se.reshape(x.shape[0], self.filters, 1, 1)
 
@@ -222,8 +223,7 @@ class __FusedMBConvPT(nn.Module):
 
         # Residual addition with dropout
         if self.stride == 1 and self.input_filters == self.output_filters:
-            if self.dropout:
-                x = nn.functional.dropout(x, self.dropout, self.training)
+            x = drop_path(x, self.dropout, self.training)
             x = x + inputs
         return x
 
